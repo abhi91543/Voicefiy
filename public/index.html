@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voicefiy - AI Text-to-Speech & Story Studio | Developed by Abhishek</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow-bg"></div>
+  
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">Voicefiy</div>
+      <div class="creator-badge">✨ Developed by <span>Abhishek</span></div>
+      <p class="tagline">Convert your text into highly realistic, emotional, and breathy AI voices locally.</p>
+    </header>
+
+    <main class="card glass">
+      <!-- AI Story Generator Section -->
+      <div class="generator-section glass-inner">
+        <h3 class="section-title">✨ AI Story Generator</h3>
+        <div class="generator-grid">
+          <div class="form-group col-span-2">
+            <label for="prompt-input">Story Topic / Prompt</label>
+            <input type="text" id="prompt-input" placeholder="e.g. A couple meeting under the rain in Tokyo, talking about their dreams...">
+          </div>
+          
+          <div class="form-group">
+            <label for="genre-select">Genre</label>
+            <select id="genre-select">
+              <option value="Romance" selected>Romance</option>
+              <option value="Drama">Drama</option>
+              <option value="Suspense / Thriller">Suspense / Thriller</option>
+              <option value="Mystery">Mystery</option>
+              <option value="Fantasy">Fantasy</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="length-select">Length</label>
+            <select id="length-select">
+              <option value="short">Short (~150 words)</option>
+              <option value="medium" selected>Medium (~400 words)</option>
+              <option value="long">Long (~800 words)</option>
+              <option value="extra_long">Extra Long (~2000 words)</option>
+              <option value="full_story">Full Story (~5000 words)</option>
+            </select>
+          </div>
+
+          <div class="form-group col-span-2 api-key-container">
+            <label for="api-key-input">
+              <span>Gemini API Key</span>
+              <small>Required to write the story. Kept locally in browser.</small>
+            </label>
+            <div class="password-wrapper">
+              <input type="password" id="api-key-input" placeholder="Enter your Gemini API key (AIzaSy...)">
+              <button type="button" id="toggle-key-btn" class="toggle-password-btn">Show</button>
+            </div>
+          </div>
+        </div>
+
+        <button id="generate-story-btn" class="btn secondary-btn story-btn">
+          <span class="story-btn-text">Generate Story with Gemini</span>
+          <span class="story-btn-loader"></span>
+        </button>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="form-group">
+        <label for="text-input">Enter Text for Voiceover</label>
+        <textarea id="text-input" placeholder="Type or paste your story here... Add commas and punctuation marks for natural breathing pauses." maxlength="50000"></textarea>
+        <div class="editor-meta">
+          <div>Words: <span id="word-count">0</span></div>
+          <div>Est. Audio Length: <span id="estimated-duration">0s</span></div>
+          <div class="char-counter"><span id="char-count">0</span> / 50000</div>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="form-group">
+          <label for="voice-select">Choose AI Character Voice</label>
+          <select id="voice-select">
+            <optgroup label="Female Voices (Best for Stories)">
+              <option value="af_heart" selected>❤️ Heart - Soft & Seductive (Default)</option>
+              <option value="af_allison">🔥 Allison - Natural & Sexy</option>
+              <option value="af_bella">✨ Bella - Sweet Seductress</option>
+              <option value="af_jessica">👵 Jessica - Mature & Warm</option>
+              <option value="af_sarah">🎭 Sarah - Clear & Emotional</option>
+            </optgroup>
+            <optgroup label="Male Voices">
+              <option value="am_adam">👤 Adam - Realistic American Male</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="speed-slider">Speech Speed: <span id="speed-val">0.95x</span></label>
+          <div class="slider-container">
+            <input type="range" id="speed-slider" min="0.8" max="1.2" step="0.05" value="0.95">
+          </div>
+        </div>
+
+        <div class="form-group toggle-group">
+          <label for="pitch-toggle">
+            <span>Preserve Pitch</span>
+            <small>Turn off for a deeper, breathier, more natural slowed-down voice</small>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="pitch-toggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <button id="generate-btn" class="btn primary-btn">
+          <span class="btn-text">Generate Voice (TTS)</span>
+          <span class="btn-loader"></span>
+        </button>
+      </div>
+
+      <!-- Progress Bar Area -->
+      <div id="progress-container" class="progress-area glass-inner hide">
+        <div class="progress-status">
+          <span>Generating voiceover...</span>
+          <span id="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-details">
+          <span>Sentence: <strong id="progress-sentence-count">0/0</strong></span>
+          <span>Est. Time Remaining: <strong id="progress-time-remaining">Calculating...</strong></span>
+        </div>
+      </div>
+
+      <!-- Result Audio Area (Hidden until generated) -->
+      <div id="result-container" class="result-area glass hide">
+        <div class="visualizer-container">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        
+        <audio id="audio-player" controls></audio>
+        
+        <div class="result-meta">
+          <span>Generated Audio Duration: <strong id="exact-duration">0s</strong></span>
+        </div>
+        
+        <div class="audio-actions">
+          <a id="download-btn" class="btn secondary-btn" download="voicefiy-audio.wav">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Download WAV
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p class="developed-by">Voicefiy • Developed with ❤️ by <span class="author-highlight">Abhishek</span></p>
+      <p class="sub-footer">Running locally with AI. Zero data sent to the cloud.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
